@@ -1,0 +1,89 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Inference Service Dashboard",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Inference Latency (p50/p90/p99)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, sum(rate(inference_latency_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.9, sum(rate(inference_latency_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p90",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(inference_latency_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          { "label": "Seconds", "format": "s" },
+          { "label": null }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Throughput (inferences/s)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(rate(inference_total[1m]))",
+            "legendFormat": "RPS",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          { "label": "Req/s", "format": "reqps" },
+          { "label": null }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Replica Count (HPA)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "kube_deployment_status_replicas{deployment=\"inference-deployment\"}",
+            "legendFormat": "Replicas",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          { "label": "Replicas", "format": "short" },
+          { "label": null }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Node Pressure (CPU, Memory)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "avg(rate(psi_cpu_some_avg10[1m]))",
+            "legendFormat": "CPU pressure avg10",
+            "refId": "A"
+          },
+          {
+            "expr": "avg(rate(psi_memory_some_avg10[1m]))",
+            "legendFormat": "Mem pressure avg10",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          { "label": "% stalled", "format": "percentunit" },
+          { "label": null }
+        ]
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 1
+  }
+}
